@@ -14,45 +14,8 @@ struct InvoiceRowView: View {
     @State private var isGeneratingPDFFailed = false
     @State private var pdfGenerationError: String = ""
     
-    private var isOverdue: Bool {
-        guard let dueDate = invoice.faelligkeit else { return false }
-        return dueDate < Date()
-    }
-    
-    private var isDueToday: Bool {
-        guard let dueDate = invoice.faelligkeit else { return false }
-        return Calendar.current.isDateInToday(dueDate)
-    }
-    
-    private var dueDateText: String {
-        guard let dueDate = invoice.faelligkeit else { return "Kein Fälligkeitsdatum" }
-        let formatter = DateFormatter()
-        formatter.dateStyle = .medium
-        formatter.timeStyle = .none
-        formatter.locale = Locale(identifier: "de_DE")
-        
-        if isOverdue {
-            return "Überfällig seit \(formatter.string(from: dueDate))"
-        } else if isDueToday {
-            return "Heute fällig"
-        } else {
-            return "Fällig am \(formatter.string(from: dueDate))"
-        }
-    }
-    
-    private var dueDateColor: Color {
-        if isOverdue || isDueToday {
-            return .red
-        }
-        return .primary
-    }
-    
     var body: some View {
-        InvoiceRowContent(
-            invoice: invoice,
-            dueDateText: dueDateText,
-            dueDateColor: dueDateColor
-        )
+        InvoiceRowContent(invoice: invoice)
         .padding(.vertical, 8)
         .contentShape(Rectangle())
         .contextMenu {
@@ -208,31 +171,89 @@ struct InvoiceRowView: View {
 // MARK: - Subviews
 private struct InvoiceRowContent: View {
     let invoice: Rechnungen
-    let dueDateText: String
-    let dueDateColor: Color
+    
+    private var pkv: Bool {
+        (invoice.status ?? "").contains("PKV")
+    }
+    
+    private var beihilfe: Bool {
+        (invoice.status ?? "").contains("Beihilfe")
+    }
+    
+    private var bezahlt: Bool {
+        (invoice.status ?? "").contains("Bezahlt")
+    }
+    
+    private var daysUntilDue: String {
+        guard let dueDate = invoice.faelligkeit else { return "Kein Datum" }
+        
+        if bezahlt {
+            return "bezahlt"
+        }
+        
+        let calendar = Calendar.current
+        let today = Date()
+        let components = calendar.dateComponents([.day], from: today, to: dueDate)
+        
+        if let days = components.day {
+            if days < 0 {
+                return "überfällig"
+            } else if days == 0 {
+                return "heute fällig"
+            } else {
+                return "noch \(days) Tage"
+            }
+        }
+        return "Kein Datum"
+    }
+    
+    private var summeColor: Color {
+        guard let dueDate = invoice.faelligkeit else { return .primary }
+        return dueDate < Date() ? .red : .green
+    }
     
     var body: some View {
-        HStack {
-            VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
                 Text(invoice.name ?? "Unbenannte Rechnung")
                     .font(.headline)
-                    .lineLimit(1)
+                    .foregroundStyle(.primary)
                 
-                Text(invoice.nummer ?? "")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-            }
-            
-            Spacer()
-            
-            VStack(alignment: .trailing, spacing: 4) {
+                Spacer()
+                
                 Text(formattedCurrency(invoice.summe))
                     .font(.headline)
-                    .foregroundColor(.primary)
+                    .foregroundStyle(summeColor)
+            }
+            
+            HStack(spacing: 12) {
+                Text("\(formattedDate(invoice.faelligkeit)) (\(daysUntilDue))")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
                 
-                Text(dueDateText)
-                    .font(.subheadline)
-                    .foregroundColor(dueDateColor)
+                Spacer()
+                
+                HStack(spacing: 6) {
+                    if pkv {
+                        Text("PKV")
+                            .font(.caption)
+                            .foregroundStyle(.blue)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(.blue.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                    
+                    if beihilfe {
+                        Text("B")
+                            .font(.caption)
+                            .foregroundStyle(.blue)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(.blue.opacity(0.2))
+                            .clipShape(Capsule())
+                    }
+                }
             }
         }
     }
@@ -240,6 +261,11 @@ private struct InvoiceRowContent: View {
     private func formattedCurrency(_ amount: NSDecimalNumber?) -> String {
         guard let amount = amount else { return "0,00 €" }
         return currencyFormatter.string(from: amount) ?? "0,00 €"
+    }
+    
+    private func formattedDate(_ date: Date?) -> String {
+        guard let date = date else { return "Kein Datum" }
+        return itemFormatter.string(from: date)
     }
 }
 

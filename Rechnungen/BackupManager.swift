@@ -119,7 +119,7 @@ class BackupManager {
         var skippedCount = 0
         
         for rechnungDict in rechnungenArray {
-            // Prüfen, ob Rechnung bereits existiert (basierend auf Nummer)
+            // Prüfen, ob Rechnung bereits existiert (basierend auf Verwendungszweck)
             if let nummer = rechnungDict["nummer"] as? String,
                !nummer.isEmpty,
                let existingRechnung = findRechnung(with: nummer, in: context) {

@@ -52,7 +52,7 @@ struct RechnungDetailView: View {
             // Details und Status
             Section {
                 if let nummer = rechnung.nummer, !nummer.isEmpty {
-                    LabeledContent("Nummer") {
+                    LabeledContent("Verwendungszweck") {
                         HStack(spacing: 4) {
                             Button {
                                 UIPasteboard.general.string = nummer
@@ -379,7 +379,7 @@ struct NewRechnungView: View {
                     }
                     
                     HStack {
-                        TextField("Rechnungsnummer", text: $nummer)
+                        TextField("Verwendungszweck", text: $nummer)
                             .submitLabel(.next)
                             .onChange(of: nummer) { oldValue, newValue in
                                 validateForm()
@@ -680,7 +680,7 @@ struct EditRechnungView: View {
                     }
                     
                     HStack {
-                        TextField("Rechnungsnummer", text: $nummer)
+                        TextField("Verwendungszweck", text: $nummer)
                             .submitLabel(.next)
                             .onChange(of: nummer) { oldValue, newValue in
                                 validateForm()
@@ -966,11 +966,8 @@ struct ContentView: View {
                 // Suchfeld und Überschrift als erstes Element
                 Section {
                     SearchBar(text: $searchText)
-                        .padding(.top, 8)
-                        .padding(.bottom, 0)
+                        .padding(.vertical, 2)
                 }
-                .listRowBackground(Color.clear)
-                .listRowInsets(EdgeInsets())
                 
                 // Liste der Rechnungen
                 ForEach(filteredRechnungen, id: \.self) { rechnung in
@@ -1151,7 +1148,7 @@ struct SearchBar: View {
                 .accessibilityLabel("Suche zurücksetzen")
             }
         }
-        .padding(8)
+        .padding(4)
         .background(colorScheme == .dark ? Color(.systemGray6) : Color(.systemBackground))
         .cornerRadius(10)
     }
@@ -1601,7 +1598,7 @@ struct PrivacyPolicyView: View {
                         Text("2. Datenerfassung")
                             .font(.headline)
                         Text("Die App erfasst und speichert folgende Daten:")
-                        Text("• Rechnungsinformationen (Name, Nummer, Betrag, Datum)\n• Status-Informationen\n• Bilder und PDFs der Rechnungen")
+                        Text("• Rechnungsinformationen (Name, Verwendungszweck, Betrag, Datum)\n• Status-Informationen\n• Bilder und PDFs der Rechnungen")
                         
                         Text("3. Datenspeicherung")
                             .font(.headline)

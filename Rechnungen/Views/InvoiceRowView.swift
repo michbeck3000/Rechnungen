@@ -39,9 +39,7 @@ struct InvoiceRowView: View {
     }
     
     private var summeColor: Color {
-        if bezahlt { return .green }
-        guard let dueDate = invoice.faelligkeit else { return .primary }
-        return dueDate < Date() ? .red : .green
+        bezahlt ? .green : .red
     }
     
     var body: some View {
@@ -78,6 +76,19 @@ struct InvoiceRowView: View {
                             .padding(.vertical, 3)
                             .background(.blue.opacity(0.2))
                             .clipShape(Capsule())
+                    }
+                    if ProcessInfo.processInfo.isiOSAppOnMac {
+                        Menu {
+                            InvoiceContextMenu(
+                                showingShareSheet: $showingShareSheet,
+                                showingDuplicateAlert: $showingDuplicateAlert,
+                                showingDeleteAlert: $showingDeleteAlert
+                            )
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.body)
+                                .foregroundStyle(.secondary)
+                        }
                     }
                 }
             }
@@ -187,6 +198,7 @@ struct InvoiceRowView: View {
         
         do {
             try viewContext.save()
+            viewContext.refreshAllObjects()
         } catch {
             let nsError = error as NSError
             print("Fehler beim Duplizieren: \(nsError), \(nsError.userInfo)")

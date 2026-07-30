@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Dokument-Hintergrund -->
+    <rect x="192" y="192" width="640" height="640" rx="160" fill="#F2F2F7"/>
+    
+    <!-- Dokument-Umriss -->
+    <path d="M512 192C344.5 192 192 344.5 192 512C192 679.5 344.5 832 512 832C679.5 832 832 679.5 832 512C832 344.5 679.5 192 512 192Z" stroke="#007AFF" stroke-width="48" stroke-opacity="0.3"/>
+    
+    <!-- Häkchen -->
+    <path d="M384 512L448 576L640 384" stroke="#34C759" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,760 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		4EB056152DB1079D006883C6 /* Rechnungen+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB056142DB1079D006883C6 /* Rechnungen+CoreDataProperties.swift */; };
+		4EB056162DB1079D006883C6 /* Rechnungen+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EB056132DB1079D006883C6 /* Rechnungen+CoreDataClass.swift */; };
+		4EE3B2172F289AD900DEFC89 /* RechnungenWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 4EE3B20D2F289AD700DEFC89 /* RechnungenWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		4E0DFD182DB0CD3500701D4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E0DFCFB2DB0CD3400701D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4E0DFD022DB0CD3400701D4E;
+			remoteInfo = Rechnungen;
+		};
+		4E0DFD222DB0CD3500701D4E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E0DFCFB2DB0CD3400701D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4E0DFD022DB0CD3400701D4E;
+			remoteInfo = Rechnungen;
+		};
+		4EE3B2152F289AD900DEFC89 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4E0DFCFB2DB0CD3400701D4E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4EE3B20C2F289AD700DEFC89;
+			remoteInfo = "RechnungenWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4EE3B2182F289AD900DEFC89 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				4EE3B2172F289AD900DEFC89 /* RechnungenWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		4E0DFD032DB0CD3400701D4E /* Rechnungen.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Rechnungen.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E0DFD172DB0CD3500701D4E /* RechnungenTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RechnungenTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E0DFD212DB0CD3500701D4E /* RechnungenUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RechnungenUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4EB056132DB1079D006883C6 /* Rechnungen+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rechnungen+CoreDataClass.swift"; sourceTree = "<group>"; };
+		4EB056142DB1079D006883C6 /* Rechnungen+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Rechnungen+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		4EE3B20D2F289AD700DEFC89 /* RechnungenWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "RechnungenWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		4E0DFD292DB0CD3500701D4E /* Exceptions for "Rechnungen" folder in "Rechnungen" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 4E0DFD022DB0CD3400701D4E /* Rechnungen */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		4E0DFD052DB0CD3400701D4E /* Rechnungen */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				4E0DFD292DB0CD3500701D4E /* Exceptions for "Rechnungen" folder in "Rechnungen" target */,
+			);
+			path = Rechnungen;
+			sourceTree = "<group>";
+		};
+		4E0DFD1A2DB0CD3500701D4E /* RechnungenTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RechnungenTests;
+			sourceTree = "<group>";
+		};
+		4E0DFD242DB0CD3500701D4E /* RechnungenUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = RechnungenUITests;
+			sourceTree = "<group>";
+		};
+		4EE3B20E2F289AD700DEFC89 /* RechnungenWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "RechnungenWatch Watch App";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		4E0DFD002DB0CD3400701D4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0DFD142DB0CD3500701D4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0DFD1E2DB0CD3500701D4E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4EE3B20A2F289AD700DEFC89 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		4E0DFCFA2DB0CD3400701D4E = {
+			isa = PBXGroup;
+			children = (
+				4EB056132DB1079D006883C6 /* Rechnungen+CoreDataClass.swift */,
+				4EB056142DB1079D006883C6 /* Rechnungen+CoreDataProperties.swift */,
+				4E0DFD052DB0CD3400701D4E /* Rechnungen */,
+				4E0DFD1A2DB0CD3500701D4E /* RechnungenTests */,
+				4E0DFD242DB0CD3500701D4E /* RechnungenUITests */,
+				4EE3B20E2F289AD700DEFC89 /* RechnungenWatch Watch App */,
+				4E0DFD042DB0CD3400701D4E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		4E0DFD042DB0CD3400701D4E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				4E0DFD032DB0CD3400701D4E /* Rechnungen.app */,
+				4E0DFD172DB0CD3500701D4E /* RechnungenTests.xctest */,
+				4E0DFD212DB0CD3500701D4E /* RechnungenUITests.xctest */,
+				4EE3B20D2F289AD700DEFC89 /* RechnungenWatch Watch App.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		4E0DFD022DB0CD3400701D4E /* Rechnungen */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E0DFD2A2DB0CD3500701D4E /* Build configuration list for PBXNativeTarget "Rechnungen" */;
+			buildPhases = (
+				4E0DFCFF2DB0CD3400701D4E /* Sources */,
+				4E0DFD002DB0CD3400701D4E /* Frameworks */,
+				4E0DFD012DB0CD3400701D4E /* Resources */,
+				4EE3B2182F289AD900DEFC89 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4EE3B2162F289AD900DEFC89 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4E0DFD052DB0CD3400701D4E /* Rechnungen */,
+			);
+			name = Rechnungen;
+			packageProductDependencies = (
+			);
+			productName = Rechnungen;
+			productReference = 4E0DFD032DB0CD3400701D4E /* Rechnungen.app */;
+			productType = "com.apple.product-type.application";
+		};
+		4E0DFD162DB0CD3500701D4E /* RechnungenTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E0DFD2F2DB0CD3500701D4E /* Build configuration list for PBXNativeTarget "RechnungenTests" */;
+			buildPhases = (
+				4E0DFD132DB0CD3500701D4E /* Sources */,
+				4E0DFD142DB0CD3500701D4E /* Frameworks */,
+				4E0DFD152DB0CD3500701D4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4E0DFD192DB0CD3500701D4E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4E0DFD1A2DB0CD3500701D4E /* RechnungenTests */,
+			);
+			name = RechnungenTests;
+			packageProductDependencies = (
+			);
+			productName = RechnungenTests;
+			productReference = 4E0DFD172DB0CD3500701D4E /* RechnungenTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		4E0DFD202DB0CD3500701D4E /* RechnungenUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E0DFD322DB0CD3500701D4E /* Build configuration list for PBXNativeTarget "RechnungenUITests" */;
+			buildPhases = (
+				4E0DFD1D2DB0CD3500701D4E /* Sources */,
+				4E0DFD1E2DB0CD3500701D4E /* Frameworks */,
+				4E0DFD1F2DB0CD3500701D4E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				4E0DFD232DB0CD3500701D4E /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				4E0DFD242DB0CD3500701D4E /* RechnungenUITests */,
+			);
+			name = RechnungenUITests;
+			packageProductDependencies = (
+			);
+			productName = RechnungenUITests;
+			productReference = 4E0DFD212DB0CD3500701D4E /* RechnungenUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		4EE3B20C2F289AD700DEFC89 /* RechnungenWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4EE3B21B2F289AD900DEFC89 /* Build configuration list for PBXNativeTarget "RechnungenWatch Watch App" */;
+			buildPhases = (
+				4EE3B2092F289AD700DEFC89 /* Sources */,
+				4EE3B20A2F289AD700DEFC89 /* Frameworks */,
+				4EE3B20B2F289AD700DEFC89 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				4EE3B20E2F289AD700DEFC89 /* RechnungenWatch Watch App */,
+			);
+			name = "RechnungenWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "RechnungenWatch Watch App";
+			productReference = 4EE3B20D2F289AD700DEFC89 /* RechnungenWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		4E0DFCFB2DB0CD3400701D4E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					4E0DFD022DB0CD3400701D4E = {
+						CreatedOnToolsVersion = 16.3;
+					};
+					4E0DFD162DB0CD3500701D4E = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 4E0DFD022DB0CD3400701D4E;
+					};
+					4E0DFD202DB0CD3500701D4E = {
+						CreatedOnToolsVersion = 16.3;
+						TestTargetID = 4E0DFD022DB0CD3400701D4E;
+					};
+					4EE3B20C2F289AD700DEFC89 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+				};
+			};
+			buildConfigurationList = 4E0DFCFE2DB0CD3400701D4E /* Build configuration list for PBXProject "Rechnungen" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 4E0DFCFA2DB0CD3400701D4E;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 4E0DFD042DB0CD3400701D4E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				4E0DFD022DB0CD3400701D4E /* Rechnungen */,
+				4E0DFD162DB0CD3500701D4E /* RechnungenTests */,
+				4E0DFD202DB0CD3500701D4E /* RechnungenUITests */,
+				4EE3B20C2F289AD700DEFC89 /* RechnungenWatch Watch App */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		4E0DFD012DB0CD3400701D4E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0DFD152DB0CD3500701D4E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0DFD1F2DB0CD3500701D4E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4EE3B20B2F289AD700DEFC89 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		4E0DFCFF2DB0CD3400701D4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4EB056152DB1079D006883C6 /* Rechnungen+CoreDataProperties.swift in Sources */,
+				4EB056162DB1079D006883C6 /* Rechnungen+CoreDataClass.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0DFD132DB0CD3500701D4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0DFD1D2DB0CD3500701D4E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4EE3B2092F289AD700DEFC89 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		4E0DFD192DB0CD3500701D4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4E0DFD022DB0CD3400701D4E /* Rechnungen */;
+			targetProxy = 4E0DFD182DB0CD3500701D4E /* PBXContainerItemProxy */;
+		};
+		4E0DFD232DB0CD3500701D4E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4E0DFD022DB0CD3400701D4E /* Rechnungen */;
+			targetProxy = 4E0DFD222DB0CD3500701D4E /* PBXContainerItemProxy */;
+		};
+		4EE3B2162F289AD900DEFC89 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4EE3B20C2F289AD700DEFC89 /* RechnungenWatch Watch App */;
+			targetProxy = 4EE3B2152F289AD900DEFC89 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		4E0DFD2B2DB0CD3500701D4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Rechnungen/Rechnungen.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = PVT478B843;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Rechnungen/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Diese App benötigt Zugriff auf die Kamera, um Rechnungen zu fotografieren.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Diese App benötigt Zugriff auf die Fotogalerie, um gespeicherte Rechnungsbilder auszuwählen.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeckdev.Rechnungen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		4E0DFD2C2DB0CD3500701D4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Rechnungen/Rechnungen.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = PVT478B843;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Rechnungen/Info.plist;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Diese App benötigt Zugriff auf die Kamera, um Rechnungen zu fotografieren.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Diese App benötigt Zugriff auf die Fotogalerie, um gespeicherte Rechnungsbilder auszuwählen.";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.1;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeckdev.Rechnungen;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		4E0DFD2D2DB0CD3500701D4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = CRK39JD773;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		4E0DFD2E2DB0CD3500701D4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = CRK39JD773;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		4E0DFD302DB0CD3500701D4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CRK39JD773;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeck.RechnungenTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Rechnungen.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Rechnungen";
+			};
+			name = Debug;
+		};
+		4E0DFD312DB0CD3500701D4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CRK39JD773;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.4;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeck.RechnungenTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Rechnungen.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Rechnungen";
+			};
+			name = Release;
+		};
+		4E0DFD332DB0CD3500701D4E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CRK39JD773;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeck.RechnungenUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Rechnungen;
+			};
+			name = Debug;
+		};
+		4E0DFD342DB0CD3500701D4E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CRK39JD773;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeck.RechnungenUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Rechnungen;
+			};
+			name = Release;
+		};
+		4EE3B2192F289AD900DEFC89 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PVT478B843;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RechnungenWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.michbeckdev.Rechnungen;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeckdev.Rechnungen.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Debug;
+		};
+		4EE3B21A2F289AD900DEFC89 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PVT478B843;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = RechnungenWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.michbeckdev.Rechnungen;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = de.michbeckdev.Rechnungen.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.2;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		4E0DFCFE2DB0CD3400701D4E /* Build configuration list for PBXProject "Rechnungen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E0DFD2D2DB0CD3500701D4E /* Debug */,
+				4E0DFD2E2DB0CD3500701D4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E0DFD2A2DB0CD3500701D4E /* Build configuration list for PBXNativeTarget "Rechnungen" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E0DFD2B2DB0CD3500701D4E /* Debug */,
+				4E0DFD2C2DB0CD3500701D4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E0DFD2F2DB0CD3500701D4E /* Build configuration list for PBXNativeTarget "RechnungenTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E0DFD302DB0CD3500701D4E /* Debug */,
+				4E0DFD312DB0CD3500701D4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4E0DFD322DB0CD3500701D4E /* Build configuration list for PBXNativeTarget "RechnungenUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E0DFD332DB0CD3500701D4E /* Debug */,
+				4E0DFD342DB0CD3500701D4E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		4EE3B21B2F289AD900DEFC89 /* Build configuration list for PBXNativeTarget "RechnungenWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4EE3B2192F289AD900DEFC89 /* Debug */,
+				4EE3B21A2F289AD900DEFC89 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 4E0DFCFB2DB0CD3400701D4E /* Project object */;
+}

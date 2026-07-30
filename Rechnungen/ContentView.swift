@@ -339,108 +339,6 @@ struct DetailRow: View {
     }
 }
 
-struct RechnungRowView: View {
-    @ObservedObject var rechnung: Rechnungen
-    
-    private var pkv: Bool {
-        (rechnung.status ?? "").contains("PKV")
-    }
-    
-    private var beihilfe: Bool {
-        (rechnung.status ?? "").contains("Beihilfe")
-    }
-    
-    private var bezahlt: Bool {
-        (rechnung.status ?? "").contains("Bezahlt")
-    }
-    
-    var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Text(rechnung.name ?? "Unbenannte Rechnung")
-                    .font(.headline)
-                    .foregroundStyle(.primary)
-                    .accessibilityLabel("Rechnung: \(rechnung.name ?? "Unbenannte Rechnung")")
-                
-                Spacer()
-                
-                Text(formattedCurrency(rechnung.summe))
-                    .font(.headline)
-                    .foregroundStyle(bezahlt ? .green : .red)
-                    .accessibilityLabel("Betrag: \(formattedCurrency(rechnung.summe))")
-            }
-            
-            HStack(spacing: 12) {
-                Text("\(formattedDate(rechnung.faelligkeit)) (\(daysUntilDue))")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .accessibilityLabel("Fälligkeitsdatum: \(formattedDate(rechnung.faelligkeit)), \(daysUntilDue)")
-                
-                Spacer()
-                
-                HStack(spacing: 6) {
-                        if pkv {
-                            Text("PKV")
-                                .font(.caption)
-                                .foregroundStyle(.blue)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(.blue.opacity(0.2))
-                                .clipShape(Capsule())
-                            .accessibilityLabel("PKV Status")
-                        }
-                    
-                        if beihilfe {
-                            Text("B")
-                                .font(.caption)
-                                .foregroundStyle(.blue)
-                                .padding(.horizontal, 6)
-                                .padding(.vertical, 3)
-                                .background(.blue.opacity(0.2))
-                                .clipShape(Capsule())
-                            .accessibilityLabel("Beihilfe Status")
-                        }
-                }
-            }
-        }
-        .padding(.vertical, 8)
-    }
-    
-    private var daysUntilDue: String {
-        guard let dueDate = rechnung.faelligkeit else { return "Kein Datum" }
-        
-        // Wenn die Rechnung bezahlt ist, zeige keine Fälligkeitsinformation an
-        if bezahlt {
-            return "bezahlt"
-        }
-        
-        let calendar = Calendar.current
-        let today = Date()
-        let components = calendar.dateComponents([.day], from: today, to: dueDate)
-        
-        if let days = components.day {
-            if days < 0 {
-                return "überfällig"
-            } else if days == 0 {
-                return "heute fällig"
-            } else {
-                return "noch \(days) Tage"
-            }
-        }
-        return "Kein Datum"
-    }
-    
-    private func formattedDate(_ date: Date?) -> String {
-        guard let date = date else { return "Kein Datum" }
-        return itemFormatter.string(from: date)
-    }
-    
-    private func formattedCurrency(_ amount: NSDecimalNumber?) -> String {
-        guard let amount = amount else { return "0,00 €" }
-        return currencyFormatter.string(from: amount) ?? "0,00 €"
-    }
-}
-
 struct NewRechnungView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Binding var showingAddSheet: Bool
@@ -1079,22 +977,7 @@ struct ContentView: View {
                     NavigationLink {
                         RechnungDetailView(rechnung: rechnung)
                     } label: {
-                        RechnungRowView(rechnung: rechnung)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
-                            rechnungToDelete = rechnung
-                            showingDeleteAlert = true
-                        } label: {
-                            Label("Löschen", systemImage: "trash")
-                        }
-                        
-                        Button {
-                            duplicateItem(rechnung)
-                        } label: {
-                            Label("Duplizieren", systemImage: "doc.on.doc")
-                        }
-                        .tint(.blue)
+                        InvoiceRowView(invoice: rechnung)
                     }
                 }
             }

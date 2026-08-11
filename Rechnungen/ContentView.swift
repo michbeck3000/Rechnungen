@@ -923,6 +923,8 @@ struct ContentView: View {
     @State private var showingEditSheet = false
     @State private var showingSettings = false
     @State private var isDuplicating = false
+    @State private var syncTimer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
+    @Environment(\.scenePhase) private var scenePhase
     
     private var filteredRechnungen: [Rechnungen] {
         let filteredBySearch = rechnungenListe.filter { rechnung in
@@ -1027,6 +1029,14 @@ struct ContentView: View {
             if !hasUpdatedStatuses {
                 updateExistingStatuses()
                 hasUpdatedStatuses = true
+            }
+        }
+        .onReceive(syncTimer) { _ in
+            viewContext.refreshAllObjects()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                viewContext.refreshAllObjects()
             }
         }
     }

@@ -74,5 +74,26 @@ class PersistenceController {
         ) { [weak self] _ in
             self?.container.viewContext.refreshAllObjects()
         }
+        
+        // CloudKit-Event-Monitoring für Diagnose
+        NotificationCenter.default.addObserver(
+            forName: NSPersistentCloudKitContainer.eventChangedNotification,
+            object: container,
+            queue: .main
+        ) { notification in
+            guard let userInfo = notification.userInfo,
+                  let event = userInfo[NSPersistentCloudKitContainer.eventNotificationUserInfoKey] as? NSPersistentCloudKitContainer.Event
+            else { return }
+            
+            if let error = event.error {
+                print("CloudKit-Sync-Fehler: \(error)")
+            } else if let endDate = event.endDate {
+                print("CloudKit-Sync: \(event.type) abgeschlossen in \(Int(endDate.timeIntervalSince(event.startDate)))s")
+            }
+        }
+    }
+    
+    func refreshFromCloudKit() {
+        container.viewContext.refreshAllObjects()
     }
 }

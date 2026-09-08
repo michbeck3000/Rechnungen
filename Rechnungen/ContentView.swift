@@ -1442,15 +1442,23 @@ struct PDFPreviewView: UIViewControllerRepresentable {
         containerVC.view.addSubview(controller.view)
         controller.didMove(toParent: containerVC)
         
-        // Schließen-Button erstellen
+        // Schliessen-Button erstellen
         let closeButton = UIButton(type: .system)
         closeButton.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         closeButton.tintColor = .gray
         closeButton.addTarget(context.coordinator, action: #selector(Coordinator.dismissPreview), for: .touchUpInside)
         
-        // Button zur View hinzufügen
+        // Download-Button erstellen
+        let downloadButton = UIButton(type: .system)
+        downloadButton.setImage(UIImage(systemName: "square.and.arrow.down"), for: .normal)
+        downloadButton.tintColor = .gray
+        downloadButton.addTarget(context.coordinator, action: #selector(Coordinator.downloadPDF(_:)), for: .touchUpInside)
+        
+        // Buttons zur View hinzufuegen
         closeButton.translatesAutoresizingMaskIntoConstraints = false
+        downloadButton.translatesAutoresizingMaskIntoConstraints = false
         containerVC.view.addSubview(closeButton)
+        containerVC.view.addSubview(downloadButton)
         
         // View des PDF Controllers für Auto Layout vorbereiten
         controller.view.translatesAutoresizingMaskIntoConstraints = false
@@ -1463,7 +1471,13 @@ struct PDFPreviewView: UIViewControllerRepresentable {
             controller.view.trailingAnchor.constraint(equalTo: containerVC.view.trailingAnchor),
             controller.view.bottomAnchor.constraint(equalTo: containerVC.view.bottomAnchor),
             
-            // Button Constraints
+            // Download-Button oben links
+            downloadButton.topAnchor.constraint(equalTo: containerVC.view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            downloadButton.leadingAnchor.constraint(equalTo: containerVC.view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            downloadButton.widthAnchor.constraint(equalToConstant: 44),
+            downloadButton.heightAnchor.constraint(equalToConstant: 44),
+            
+            // Schliessen-Button oben rechts
             closeButton.topAnchor.constraint(equalTo: containerVC.view.safeAreaLayoutGuide.topAnchor, constant: 16),
             closeButton.trailingAnchor.constraint(equalTo: containerVC.view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
             closeButton.widthAnchor.constraint(equalToConstant: 44),
@@ -1472,6 +1486,7 @@ struct PDFPreviewView: UIViewControllerRepresentable {
         
         // PDF View auf den Vordergrund bringen
         containerVC.view.bringSubviewToFront(closeButton)
+        containerVC.view.bringSubviewToFront(downloadButton)
         
         return containerVC
     }
@@ -1485,6 +1500,7 @@ struct PDFPreviewView: UIViewControllerRepresentable {
     class Coordinator: NSObject, QLPreviewControllerDataSource {
         let data: Data
         let dismiss: DismissAction
+        private let tempFileName = UUID().uuidString + ".pdf"
         
         init(data: Data, dismiss: DismissAction) {
             self.data = data
@@ -1496,12 +1512,24 @@ struct PDFPreviewView: UIViewControllerRepresentable {
             dismiss()
         }
         
+        @objc func downloadPDF(_ sender: UIButton) {
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(tempFileName)
+            try? data.write(to: tempURL)
+            
+            let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
+            if let sourceView = sender.superview {
+                activityVC.popoverPresentationController?.sourceView = sourceView
+                activityVC.popoverPresentationController?.sourceRect = sender.frame
+            }
+            sender.findViewController()?.present(activityVC, animated: true)
+        }
+        
         func numberOfPreviewItems(in controller: QLPreviewController) -> Int {
             return 1
         }
         
         func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent("temp.pdf")
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(tempFileName)
             try? data.write(to: tempURL)
             return tempURL as QLPreviewItem
         }
@@ -1754,5 +1782,18 @@ struct AccessibilityView: View {
     }
 }
 
+
+// MARK: - UIView Helper
+
+private extension UIView {
+    func findViewController() -> UIViewController? {
+        var responder: UIResponder? = self
+        while let next = responder?.next {
+            if let vc = next as? UIViewController { return vc }
+            responder = next
+        }
+        return nil
+    }
+}
 
 

@@ -1570,6 +1570,11 @@ struct SettingsView: View {
                         BackupView()
                     }
                     .font(.footnote)
+                    
+                    NavigationLink("Statistik") {
+                        StatisticsView()
+                    }
+                    .font(.footnote)
                 }
                 
                 Section("Rechtliches") {

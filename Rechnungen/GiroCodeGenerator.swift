@@ -257,7 +257,7 @@ private extension UIImage {
         guard longestSide > maxPixels else { return self }
         let scale = maxPixels / longestSide
         let newSize = CGSize(width: size.width * scale, height: size.height * scale)
-        var format = UIGraphicsImageRendererFormat()
+        let format = UIGraphicsImageRendererFormat()
         format.scale = 1
         format.opaque = true
         return UIGraphicsImageRenderer(size: newSize, format: format).image { context in

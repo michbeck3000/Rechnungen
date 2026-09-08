@@ -195,7 +195,7 @@ struct RechnungDetailView: View {
                     }
             }
         }
-        .sheet(isPresented: $showingPDFPreview) {
+        .fullScreenCover(isPresented: $showingPDFPreview) {
             if let pdfData = rechnung.pdf {
                 PDFPreviewView(data: pdfData)
             }

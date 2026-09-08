@@ -23,8 +23,18 @@ class ConnectivityManager: NSObject, WCSessionDelegate, ObservableObject {
             "qrCodeData": qrCodeData
         ]
         
-        // Update Application Context (background update)
-        try? WCSession.default.updateApplicationContext(message)
+        if qrCodeData.count < GiroCodeGenerator.maxWatchPayloadBytes {
+            // Update Application Context (background update)
+            do {
+                try WCSession.default.updateApplicationContext(message)
+            } catch {
+                print("ApplicationContext fehlgeschlagen, nutze transferUserInfo: \(error.localizedDescription)")
+                WCSession.default.transferUserInfo(message)
+            }
+        } else {
+            // Zu groß für Application Context (~65 KB Limit) → queued Transfer
+            WCSession.default.transferUserInfo(message)
+        }
         
         // Also try sending immediate message if reachable
         if WCSession.default.isReachable {

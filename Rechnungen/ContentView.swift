@@ -73,7 +73,7 @@ struct RechnungDetailView: View {
                     HStack(spacing: 4) {
                         Button {
                             if let summe = rechnung.summe {
-                                UIPasteboard.general.string = String(format: "%.2f", summe.doubleValue).replacingOccurrences(of: ".", with: ",")
+                                UIPasteboard.general.string = DecimalParser.string(from: summe) ?? ""
                                 showingCopiedAlert = true
                             }
                         } label: {
@@ -264,12 +264,12 @@ struct RechnungDetailView: View {
         else { return }
         
         DispatchQueue.global(qos: .userInitiated).async {
-            if let qrImage = GiroCodeGenerator.generateQRCode(
+            if let imageData = GiroCodeGenerator.generateWatchQRCodeData(
                 empfaenger: name,
                 iban: iban,
                 betrag: summe.decimalValue,
                 verwendungszweck: self.rechnung.nummer ?? ""
-            ), let imageData = qrImage.pngData() {
+            ) {
                 ConnectivityManager.shared.sendInvoiceData(title: name, qrCodeData: imageData)
             }
         }
@@ -542,7 +542,7 @@ struct NewRechnungView: View {
     }
     
     private var isSummeValid: Bool {
-        if let summe = Double(summeText.replacingOccurrences(of: ",", with: ".")), summe > 0 {
+        if let summe = DecimalParser.parse(summeText), summe > 0 {
             return true
         }
         return false
@@ -562,8 +562,8 @@ struct NewRechnungView: View {
             neueRechnung.iban = iban
             
             
-            if let summe = Double(summeText.replacingOccurrences(of: ",", with: ".")) {
-                neueRechnung.summe = NSDecimalNumber(value: summe)
+            if let summe = DecimalParser.parse(summeText) {
+                neueRechnung.summe = NSDecimalNumber(decimal: summe)
             }
             
             if let selectedImage = selectedImage {
@@ -642,8 +642,9 @@ struct EditRechnungView: View {
         _iban = State(initialValue: rechnung.iban ?? "")
         
         
-        let summeValue = rechnung.summe?.doubleValue ?? 0.0
-        _summeText = State(initialValue: summeValue == 0.0 ? "" : String(format: "%.2f", summeValue).replacingOccurrences(of: ".", with: ","))
+        let summeDecimal = rechnung.summe?.decimalValue ?? Decimal.zero
+        let summeIsPositive = !summeDecimal.isNaN && summeDecimal > Decimal.zero
+        _summeText = State(initialValue: summeIsPositive ? (DecimalParser.string(from: NSDecimalNumber(decimal: summeDecimal)) ?? "") : "")
         
         _datum = State(initialValue: rechnung.datum ?? Date())
         _faelligkeit = State(initialValue: rechnung.faelligkeit ?? Date())
@@ -659,7 +660,7 @@ struct EditRechnungView: View {
         
         _isFormValid = State(initialValue: !(rechnung.name?.isEmpty ?? true) && 
                                     !(rechnung.nummer?.isEmpty ?? true) && 
-                                    summeValue > 0)
+                                    summeIsPositive)
     }
     
     var body: some View {
@@ -854,7 +855,7 @@ struct EditRechnungView: View {
     }
     
     private var isSummeValid: Bool {
-        if let summe = Double(summeText.replacingOccurrences(of: ",", with: ".")), summe > 0 {
+        if let summe = DecimalParser.parse(summeText), summe > 0 {
             return true
         }
         return false
@@ -873,8 +874,8 @@ struct EditRechnungView: View {
             rechnung.iban = iban
             
             
-            if let summe = Double(summeText.replacingOccurrences(of: ",", with: ".")) {
-                rechnung.summe = NSDecimalNumber(value: summe)
+            if let summe = DecimalParser.parse(summeText) {
+                rechnung.summe = NSDecimalNumber(decimal: summe)
             }
             
             if let selectedImage = selectedImage, let imageData = selectedImage.jpegData(compressionQuality: 0.8) {
@@ -1180,6 +1181,41 @@ let currencyFormatter: NumberFormatter = {
     formatter.maximumFractionDigits = 2
     return formatter
 }()
+
+/// Parst und formatiert Geldbeträge strikt deutsch ("1.234,56"), ohne Double-Umweg.
+/// Der Double-Umweg rundet binär und verliert Cent (z.B. 125,50 → 125,49).
+enum DecimalParser {
+    private static let german: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.locale = Locale(identifier: "de_DE")
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+    
+    private static let allowedCharacters = CharacterSet.decimalDigits
+        .union(CharacterSet(charactersIn: ",. "))
+    
+    /// Parst z.B. "125,50" oder "1.234,56" zu Decimal, sonst nil
+    static func parse(_ text: String) -> Decimal? {
+        let trimmed = text.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty,
+              trimmed.unicodeScalars.allSatisfy({ allowedCharacters.contains($0) }),
+              let number = german.number(from: trimmed) else {
+            return nil
+        }
+        let decimal = number.decimalValue
+        return decimal.isNaN ? nil : decimal
+    }
+    
+    /// Formatiert z.B. 125.5 zu "125,50" (für Anzeige und Zwischenablage)
+    static func string(from amount: NSDecimalNumber) -> String? {
+        let decimal = amount.decimalValue
+        guard !decimal.isNaN else { return nil }
+        return german.string(from: amount)
+    }
+}
 
 // UIViewControllerRepresentable für die Bildauswahl
 struct ImagePicker: UIViewControllerRepresentable {

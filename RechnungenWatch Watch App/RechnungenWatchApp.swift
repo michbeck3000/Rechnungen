@@ -50,6 +50,10 @@ class WatchConnectivityManager: NSObject, ObservableObject, WCSessionDelegate {
         processData(message)
     }
     
+    func session(_ session: WCSession, didReceiveUserInfo userInfo: [String : Any] = [:]) {
+        processData(userInfo)
+    }
+    
     private func processData(_ data: [String: Any]) {
         DispatchQueue.main.async {
             if let title = data["title"] as? String {

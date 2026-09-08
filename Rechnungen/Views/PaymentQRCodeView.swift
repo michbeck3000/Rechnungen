@@ -15,7 +15,7 @@ struct PaymentQRCodeView: View {
             return nil
         }
         
-        let betragDecimal = Decimal(betrag.doubleValue)
+        let betragDecimal = betrag.decimalValue
         return GiroCodeGenerator.generateQRCode(
             empfaenger: empfaenger,
             iban: iban,

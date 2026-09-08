@@ -94,7 +94,7 @@ struct StatisticsView: View {
                             }
                         }
                     } header: {
-                        Text("\(jahrGruppe.jahr)")
+                        Text(verbatim: String(jahrGruppe.jahr))
                             .font(.headline)
                     }
                 }

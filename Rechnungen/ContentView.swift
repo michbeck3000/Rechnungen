@@ -197,7 +197,7 @@ struct RechnungDetailView: View {
         }
         .fullScreenCover(isPresented: $showingPDFPreview) {
             if let pdfData = rechnung.pdf {
-                PDFPreviewView(data: pdfData)
+                PDFPreviewView(data: pdfData, fileName: pdfFileName)
             }
         }
         .overlay(
@@ -231,6 +231,21 @@ struct RechnungDetailView: View {
     private func formattedDate(_ date: Date?) -> String {
         guard let date = date else { return "Kein Datum" }
         return itemFormatter.string(from: date)
+    }
+    
+    private var pdfFileName: String {
+        let name = rechnung.name ?? "Rechnung"
+        let sanitized = name.replacingOccurrences(of: "[/\\\\?%*:|\"<>]", with: "", options: .regularExpression)
+        let date: String
+        if let d = rechnung.datum {
+            let f = DateFormatter()
+            f.dateFormat = "yyyy-MM-dd"
+            f.locale = Locale(identifier: "de_DE")
+            date = f.string(from: d)
+        } else {
+            date = "ohne Datum"
+        }
+        return "\(sanitized) \(date).pdf"
     }
     
     private func formattedCurrency(_ amount: NSDecimalNumber?) -> String {
@@ -1427,6 +1442,7 @@ class PDFViewController: UIViewController {
 
 struct PDFPreviewView: UIViewControllerRepresentable {
     let data: Data
+    let fileName: String
     @Environment(\.dismiss) private var dismiss
     
     func makeUIViewController(context: Context) -> UIViewController {
@@ -1494,16 +1510,17 @@ struct PDFPreviewView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(data: data, dismiss: dismiss)
+        Coordinator(data: data, fileName: fileName, dismiss: dismiss)
     }
     
     class Coordinator: NSObject, QLPreviewControllerDataSource {
         let data: Data
+        let fileName: String
         let dismiss: DismissAction
-        private let tempFileName = UUID().uuidString + ".pdf"
         
-        init(data: Data, dismiss: DismissAction) {
+        init(data: Data, fileName: String, dismiss: DismissAction) {
             self.data = data
+            self.fileName = fileName
             self.dismiss = dismiss
             super.init()
         }
@@ -1513,7 +1530,7 @@ struct PDFPreviewView: UIViewControllerRepresentable {
         }
         
         @objc func downloadPDF(_ sender: UIButton) {
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(tempFileName)
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try? data.write(to: tempURL)
             
             let activityVC = UIActivityViewController(activityItems: [tempURL], applicationActivities: nil)
@@ -1529,7 +1546,7 @@ struct PDFPreviewView: UIViewControllerRepresentable {
         }
         
         func previewController(_ controller: QLPreviewController, previewItemAt index: Int) -> QLPreviewItem {
-            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(tempFileName)
+            let tempURL = FileManager.default.temporaryDirectory.appendingPathComponent(fileName)
             try? data.write(to: tempURL)
             return tempURL as QLPreviewItem
         }

@@ -517,12 +517,54 @@ function StatsView({ invoices }: { invoices: Invoice[] }) {
     e.count++
     byYear.set(y, e)
   }
+  // Top 10 Empfänger nach überwiesener Summe (nur bezahlte)
+  const byRecipient = new Map<string, { sum: number; count: number }>()
+  for (const r of paid) {
+    const name = (r.name || 'Unbenannt').trim() || 'Unbenannt'
+    const e = byRecipient.get(name) ?? { sum: 0, count: 0 }
+    e.sum += Number(r.summe) || 0
+    e.count++
+    byRecipient.set(name, e)
+  }
+  const top10 = [...byRecipient.entries()]
+    .sort((a, b) => b[1].sum - a[1].sum)
+    .slice(0, 10)
+  const maxTop = top10.length > 0 ? top10[0][1].sum : 0
   return (
     <div className="space-y-3">
       <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
         <p className="text-sm text-gray-500">Summe bezahlt ({paid.length})</p>
         <p className="text-2xl font-semibold tabular-nums">{formatGermanDecimal(total)}</p>
       </div>
+      {top10.length > 0 && (
+        <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
+          <h3 className="px-4 pb-1 pt-3 text-sm font-semibold text-gray-500">Top 10 Empfänger</h3>
+          <ul className="divide-y divide-gray-100 dark:divide-gray-800">
+            {top10.map(([name, v], i) => (
+              <li key={name} className="px-4 py-2.5">
+                <div className="flex items-baseline gap-2">
+                  <span className="w-6 shrink-0 text-sm font-semibold tabular-nums text-gray-400">{i + 1}.</span>
+                  <span className="min-w-0 flex-1 truncate text-[15px] font-medium">{name}</span>
+                  <span className="shrink-0 text-[15px] font-semibold tabular-nums">
+                    {formatGermanDecimal(v.sum)}
+                  </span>
+                </div>
+                <div className="mt-1.5 flex items-center gap-2 pl-8">
+                  <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                    <div
+                      className="h-full rounded-full bg-blue-500"
+                      style={{ width: `${maxTop > 0 ? Math.max(4, Math.round((v.sum / maxTop) * 100)) : 0}%` }}
+                    />
+                  </div>
+                  <span className="shrink-0 text-xs tabular-nums text-gray-400">
+                    {v.count} {v.count === 1 ? 'Rechnung' : 'Rechnungen'}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       {[...byYear.entries()].sort((a, b) => b[0].localeCompare(a[0])).map(([y, v]) => (
         <div key={y} className="flex justify-between rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
           <span className="font-medium">{y}</span>

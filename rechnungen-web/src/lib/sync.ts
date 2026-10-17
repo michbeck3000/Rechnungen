@@ -162,25 +162,78 @@ function saveLastFor(userId: string, iso: string) {
   }
 }
 
-async function downloadBlob(path: string): Promise<Blob | undefined> {
+/**
+ * Revision der Sync-Logik. Wird sie erhöht, wird `sync:last` einmalig verworfen
+ * und damit alles erneut gepusht (idempotent). Nötig z.B. nach der Korrektur am
+ * Anhang-Upload, damit frühere Fehlversuche nachgeholt werden.
+ */
+const SYNC_REVISION = '2'
+
+function ensureRevision(userId: string) {
+  try {
+    if (localStorage.getItem(`sync:rev:${userId}`) === SYNC_REVISION) return
+    localStorage.removeItem(lastKey(userId))
+    localStorage.removeItem('sync:last')
+    localStorage.setItem(`sync:rev:${userId}`, SYNC_REVISION)
+  } catch {
+    // ignorieren
+  }
+}
+
+async function downloadAttachment(path: string): Promise<{ blob?: Blob; error?: unknown }> {
   const { data, error } = await supabase.storage.from(ATTACH_BUCKET).download(path)
-  if (error || !data) return undefined
-  return data
+  if (error || !data) return { error: error ?? { message: 'Download fehlgeschlagen' } }
+  return { blob: data }
 }
 
 /**
- * Anhang hochladen. Falls `upsert` scheitert (z.B. fehlende UPDATE-Policy oder
- * liegengebliebenes Objekt), einmal aufräumen und neu anlegen.
+ * Anhang hochladen.
+ *
+ * Ursache des früheren Fehlers „No content provided“: storage-js hängt einen
+ * `Blob` als Multipart-Teil mit **leerem Feldnamen** an. Der Storage-Server
+ * (createObject → request.parts()) findet dann keinen Datei-Teil und antwortet
+ * mit ERRORS.NoContentProvided. Deshalb hier Multipart selbst aufbauen – mit
+ * benanntem Feld `file`, das der Server erwartet (Feld `contentType` legt den
+ * MIME-Typ fest und muss vor der Datei stehen).
+ * Fällt das durch, wird als zweiter Versuch der Rohkörper (ArrayBuffer) gesendet.
  */
+/**
+ * Multipart-Formular für einen Anhang.
+ *
+ * Der Storage-Server liest den MIME-Typ aus dem Feld `contentType` und erwartet
+ * die Datei als Teil `file`; Felder müssen vor der Datei stehen. Ein Blob direkt
+ * an storage-js zu geben, scheitert (Feldname leer → „No content provided“).
+ */
+export function buildAttachmentForm(blob: Blob, contentType: string, filename: string): FormData {
+  const form = new FormData()
+  form.append('contentType', contentType)
+  form.append('file', new File([blob], filename, { type: contentType }), filename)
+  return form
+}
+
 async function uploadAttachment(path: string, blob: Blob, contentType: string): Promise<unknown | null> {
-  const first = await supabase.storage.from(ATTACH_BUCKET).upload(path, blob, { upsert: true, contentType })
-  if (!first.error) return null
-  await supabase.storage.from(ATTACH_BUCKET).remove([path])
-  const second = await supabase.storage.from(ATTACH_BUCKET).upload(path, blob, { upsert: true, contentType })
-  if (second.error) {
-    return { ...second.error, message: `${describeError(second.error)} (ursprünglich: ${describeError(first.error)})` }
+  const bucket = supabase.storage.from(ATTACH_BUCKET)
+  if (blob.size === 0) {
+    return { message: 'Anhang ist leer (0 Bytes) – bitte Datei erneut anhängen' }
   }
-  return null
+
+  const multi = await bucket.upload(path, buildAttachmentForm(blob, contentType, path.split('/').pop() || 'anhang'), {
+    upsert: true,
+    contentType,
+  })
+  if (!multi.error) return null
+
+  // Fallback: klassischer Rohkörper
+  let bytes: ArrayBuffer
+  try {
+    bytes = await blob.arrayBuffer()
+  } catch (err) {
+    return { message: `Anhang nicht lesbar (${describeError(err)})` }
+  }
+  const raw = await bucket.upload(path, bytes, { upsert: true, contentType })
+  if (!raw.error) return null
+
+  return { message: `${describeError(multi.error)} (Rohkörper-Versuch: ${describeError(raw.error)})` }
 }
 
 async function removeAttachments(paths: string[]) {
@@ -206,6 +259,7 @@ export async function syncNow(): Promise<void> {
   setState({ kind: 'syncing' })
   const problems: string[] = []
   try {
+    ensureRevision(user.id)
     const last = loadLastFor(user.id)
 
     // --- Push: neue/geänderte Zeilen und solche mit offenen Anhängen ---
@@ -223,7 +277,7 @@ export async function syncNow(): Promise<void> {
           // Pfad nicht mitschicken: Remote-Stand nicht kaputt machen, Retry über syncPending.
           delete payload.bild_path
           attachmentsOk = false
-          problems.push(`Foto „${label}“: ${describeError(err)}`)
+          problems.push(`Foto „${label}“ (${Math.round(inv.bild.size / 1024)} KB): ${describeError(err)}`)
         }
       }
       if (inv.pdf && row.pdf_path) {
@@ -231,7 +285,7 @@ export async function syncNow(): Promise<void> {
         if (err) {
           delete payload.pdf_path
           attachmentsOk = false
-          problems.push(`PDF „${label}“: ${describeError(err)}`)
+          problems.push(`PDF „${label}“ (${Math.round(inv.pdf.size / 1024)} KB): ${describeError(err)}`)
         }
       }
 
@@ -283,28 +337,29 @@ export async function syncNow(): Promise<void> {
       if (local && !missingAttachment && row.updated_at <= local.updatedAt) continue
 
       const merged = rowToLocal(row)
+      const label = merged.name || 'Unbenannt'
       let downloadFailed = false
       if (row.bild_path) {
-        const blob = await downloadBlob(row.bild_path)
-        if (blob) {
-          merged.bild = blob
-          merged.bildType = blob.type || local?.bildType || 'image/jpeg'
+        const got = await downloadAttachment(row.bild_path)
+        if (got.blob) {
+          merged.bild = got.blob
+          merged.bildType = got.blob.type || local?.bildType || 'image/jpeg'
           merged.bildName = local?.bildName
         } else {
           downloadFailed = true
-          problems.push(`Foto „${merged.name || 'Unbenannt'}“: Download fehlgeschlagen`)
+          problems.push(`Foto „${label}“ nicht ladbar: ${describeError(got.error)}`)
         }
       }
       // Kein bild_path -> Anhang wurde auf einem anderen Gerät entfernt
       // (merged enthält dann bewusst keinen bild-Schlüssel).
       if (row.pdf_path) {
-        const blob = await downloadBlob(row.pdf_path)
-        if (blob) {
-          merged.pdf = blob
+        const got = await downloadAttachment(row.pdf_path)
+        if (got.blob) {
+          merged.pdf = got.blob
           merged.pdfName = local?.pdfName ?? 'Anhang.pdf'
         } else {
           downloadFailed = true
-          problems.push(`PDF „${merged.name || 'Unbenannt'}“: Download fehlgeschlagen`)
+          problems.push(`PDF „${label}“ nicht ladbar: ${describeError(got.error)}`)
         }
       }
       if (downloadFailed) merged.syncPending = true

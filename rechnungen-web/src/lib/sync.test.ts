@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { attachPath, describeError, localToRow, normalizeTimestamp, rowToLocal } from './sync'
+import { attachPath, buildAttachmentForm, describeError, localToRow, normalizeTimestamp, rowToLocal } from './sync'
 import type { Invoice } from './types'
 
 const sample: Invoice = {
@@ -69,5 +69,15 @@ describe('sync mapping', () => {
     expect(describeError({ message: 'nope', statusCode: 413, code: 'X', details: 'zu groß' })).toBe('nope · HTTP 413 · Code X · zu groß')
     expect(describeError(new Error('kaputt'))).toBe('kaputt')
     expect(describeError('roh')).toBe('roh')
+  })
+
+  it('Anhang-Formular: contentType-Feld vor dem file-Teil (Server-Erwartung)', () => {
+    const form = buildAttachmentForm(new Blob(['abc'], { type: 'application/pdf' }), 'application/pdf', 'pdf')
+    const entries = [...form.entries()]
+    expect(entries.map(([key]) => key)).toEqual(['contentType', 'file'])
+    expect(entries[0][1]).toBe('application/pdf')
+    const file = entries[1][1] as File
+    expect(file.name).toBe('pdf')
+    expect(file.type).toBe('application/pdf')
   })
 })

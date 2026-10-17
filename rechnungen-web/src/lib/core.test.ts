@@ -3,6 +3,23 @@ import { formatIBAN, validateAndCleanIBAN } from './iban'
 import { formatGermanDecimal, parseGermanDecimal, toEPCAmount } from './decimal'
 import { buildGiroCodePayload, createGiroCodeString } from './girocode'
 import { parseV1Status } from './backup'
+import { toPlainText } from './format'
+
+describe('toPlainText (Kopieren)', () => {
+  it('entfernt Steuerzeichen, Zero-Width und BOM', () => {
+    expect(toPlainText('Dr.\u0000 Max\u200b')).toBe('Dr. Max')
+    expect(toPlainText('\ufeffR-1\u200e')).toBe('R-1')
+    expect(toPlainText('Zeile1\u0007\u001f')).toBe('Zeile1')
+  })
+  it('ersetzt Sonder-Leerzeichen und fasst Leerzeichen zusammen', () => {
+    expect(toPlainText('Bitte\u00a0sehr\u00a0\u00a0kurzfristig')).toBe('Bitte sehr kurzfristig')
+    expect(toPlainText('  Wert   ')).toBe('Wert')
+  })
+  it('lässt normale Werte unverändert', () => {
+    expect(toPlainText('DE89 3704 0044 0532 0130 00')).toBe('DE89 3704 0044 0532 0130 00')
+    expect(toPlainText('1.234,56')).toBe('1.234,56')
+  })
+})
 
 describe('decimal (Port DecimalParser)', () => {
   it('parst deutsche Beträge', () => {

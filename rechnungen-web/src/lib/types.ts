@@ -21,6 +21,8 @@ export interface Invoice {
   pdf?: Blob
   createdAt: string // ISO datetime
   updatedAt: string // ISO datetime
+  /** Nur Sync-intern: true = Zeile/Anhänge müssen erneut hoch- bzw. geladen werden. */
+  syncPending?: boolean
 }
 
 export interface BackupV2 {

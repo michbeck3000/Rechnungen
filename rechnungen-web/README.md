@@ -36,6 +36,9 @@ Push auf `main` baut via `.github/workflows/pages.yml` und deployed `rechnungen-
 
 * IndexedDB bleibt lokale Wahrheit (offline-fähig). `src/lib/sync.ts`: Push bei Änderung (entprellt, 3 s), Pull bei Login, alle 60 s und bei Tab-Rückkehr. Konflikt = neuere `updatedAt` gewinnt, Löschen via Tombstones/Soft-Delete.
 * Anhänge liegen in Supabase Storage (Bucket `attachments`, Pfad `<user-id>/<rechnungs-id>/bild|pdf`), privat per RLS.
+* Robust: Fehler einzelner Zeilen/Anhänge brechen den Lauf nicht ab – sie werden gesammelt im Sync-Status gemeldet und über das lokale Flag `syncPending` beim nächsten Lauf erneut versucht (auch nach Weiterrücken des Sync-Zeitpunkts). Postgres-Zeitstempel (`…+00:00`) werden für den Vergleich auf ISO-UTC normalisiert. Schlägt ein `upsert` fehl, wird der Pfad nicht überschrieben.
+* Anhänge löschen: im Bearbeiten-Dialog per „Foto entfernen“/„PDF entfernen“. Lokal verschwindet der Anhang, im Storage wird das Objekt gelöscht und andere Geräte entfernen ihre Kopie beim nächsten Pull (ebenso beim Löschen einer Rechnung).
+* Kopieren („Kopieren“ und „⧉“ an Feldern) liefert immer Klartext: `toPlainText()` entfernt Steuerzeichen, Zero-Width-/Bidi-/BOM-Zeichen und ersetzt Sonder-Leerzeichen.
 * Anmeldung per Magic-Link (Supabase Auth). Login-Screen erscheint automatisch ohne Session; Konto/Sync-Status + „Jetzt syncen“ im Backup-Tab.
 * Umgebungsvariablen (`VITE_SUPABASE_URL`, `VITE_SUPABASE_KEY`) via `.env.local` – Fallback-Werte sind in `src/lib/supabase.ts` eingebaut, sodass auch der Pages-Build ohne Secrets läuft.
 ## Hinweise (Sync-Details)

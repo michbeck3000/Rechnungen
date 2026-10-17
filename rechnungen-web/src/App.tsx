@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import type { Session } from '@supabase/supabase-js'
 import { db, listInvoices, newId, nowISO, todayISO } from './lib/db'
 import { formatGermanDecimal, parseGermanDecimal, toStorageString } from './lib/decimal'
-import { formatDateISO } from './lib/format'
+import { formatDateISO, toPlainText } from './lib/format'
 import { formatIBAN } from './lib/iban'
 import { generateQRDataURL } from './lib/girocode'
 import { exportBackupV2, importBackupFile } from './lib/backup'
@@ -161,7 +161,9 @@ export default function App() {
     scheduleSync()
   }
 
-  async function copyText(text: string): Promise<boolean> {
+  async function copyText(raw: string): Promise<boolean> {
+    // Immer als Klartext in die Zwischenablage (keine Steuer-/Sonderzeichen).
+    const text = toPlainText(raw)
     try {
       await navigator.clipboard.writeText(text)
       return true
@@ -802,10 +804,16 @@ function InvoiceForm({ initial, onClose, onSaved }: {
   const [status, setStatus] = useState<InvoiceStatus[]>(initial?.status ?? [])
   const [bild, setBild] = useState<File | null>(null)
   const [pdf, setPdf] = useState<File | null>(null)
+  const [bildRemoved, setBildRemoved] = useState(false)
+  const [pdfRemoved, setPdfRemoved] = useState(false)
   const [error, setError] = useState('')
 
   const parsed = parseGermanDecimal(summe)
   const valid = name.trim() !== '' && nummer.trim() !== '' && parsed !== null
+  // Anhang, der nach dem Speichern bestehen bleibt (neu gewählt oder vorhanden)
+  const keepBild = bildRemoved ? null : bild ?? initial?.bild
+  const keepPdf = pdfRemoved ? null : pdf ?? initial?.pdf
+  const attachmentsTouched = bild !== null || pdf !== null || bildRemoved || pdfRemoved
 
   function toggle(s: InvoiceStatus) {
     setStatus((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]))
@@ -824,14 +832,23 @@ function InvoiceForm({ initial, onClose, onSaved }: {
       faelligkeit,
       status,
       iban: iban.replace(/\s/g, '').toUpperCase(),
-      bildName: bild?.name ?? initial?.bildName,
-      bildType: bild?.type ?? initial?.bildType,
-      bild: bild ?? initial?.bild,
-      pdfName: pdf?.name ?? initial?.pdfName,
-      pdf: pdf ?? initial?.pdf,
       createdAt: initial?.createdAt ?? now,
       updatedAt: now,
     }
+    // Anhänge nur setzen, wenn sie bestehen bleiben – so verschwinden gelöschte
+    // Anhänge wirklich aus dem Datensatz (und werden remote mit gelöscht).
+    if (keepBild) {
+      rec.bild = keepBild
+      rec.bildName = bild?.name ?? initial?.bildName
+      rec.bildType = bild?.type ?? initial?.bildType
+    }
+    if (keepPdf) {
+      rec.pdf = keepPdf
+      rec.pdfName = pdf?.name ?? initial?.pdfName
+    }
+    // Nach Anhang-Änderung den Sync erneut anstoßen (auch wenn updatedAt älter ist).
+    if (attachmentsTouched) rec.syncPending = true
+    else if (initial?.syncPending) rec.syncPending = initial.syncPending
     await db.invoices.put(rec)
     onSaved(id)
     scheduleSync()
@@ -863,9 +880,21 @@ function InvoiceForm({ initial, onClose, onSaved }: {
             ))}
           </div>
           <div className="flex gap-2 text-sm">
-            <label className="flex-1 cursor-pointer rounded-lg bg-white/70 p-2 text-center dark:bg-white/15">Foto {bild ? '✓' : ''}<input type="file" accept="image/*" className="hidden" onChange={(e) => setBild(e.target.files?.[0] ?? null)} /></label>
-            <label className="flex-1 cursor-pointer rounded-lg bg-white/70 p-2 text-center dark:bg-white/15">PDF {pdf ? '✓' : ''}<input type="file" accept="application/pdf" className="hidden" onChange={(e) => setPdf(e.target.files?.[0] ?? null)} /></label>
+            <label className="flex-1 cursor-pointer rounded-lg bg-white/70 p-2 text-center dark:bg-white/15">Foto {keepBild ? '✓' : ''}<input type="file" accept="image/*" className="hidden" onChange={(e) => { setBild(e.target.files?.[0] ?? null); setBildRemoved(false) }} /></label>
+            <label className="flex-1 cursor-pointer rounded-lg bg-white/70 p-2 text-center dark:bg-white/15">PDF {keepPdf ? '✓' : ''}<input type="file" accept="application/pdf" className="hidden" onChange={(e) => { setPdf(e.target.files?.[0] ?? null); setPdfRemoved(false) }} /></label>
           </div>
+          {(keepBild || keepPdf || bildRemoved || pdfRemoved) && (
+            <div className="flex flex-wrap gap-2 text-xs">
+              {keepBild && (
+                <button onClick={() => { setBild(null); setBildRemoved(true) }} className="rounded-lg bg-red-50 px-3 py-1.5 text-red-600 dark:bg-red-950/50 dark:text-red-400">Foto entfernen</button>
+              )}
+              {keepPdf && (
+                <button onClick={() => { setPdf(null); setPdfRemoved(true) }} className="rounded-lg bg-red-50 px-3 py-1.5 text-red-600 dark:bg-red-950/50 dark:text-red-400">PDF entfernen</button>
+              )}
+              {bildRemoved && initial?.bild && <span className="px-1 py-1.5 text-gray-500">Foto wird beim Speichern gelöscht</span>}
+              {pdfRemoved && initial?.pdf && <span className="px-1 py-1.5 text-gray-500">PDF wird beim Speichern gelöscht</span>}
+            </div>
+          )}
           {error && <p className="text-sm text-red-600">{error}</p>}
           {!valid && <p className="text-xs text-gray-500">* Pflichtfelder</p>}
         </div>

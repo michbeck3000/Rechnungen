@@ -153,6 +153,12 @@ export async function importBackupFile(file: File): Promise<ImportResult> {
   let updated = 0
   let skipped = 0
 
+  // Importierte Anhänge in jedem Fall (erneut) hochladen – auch wenn der
+  // updatedAt-Stand älter als der letzte Sync ist.
+  for (const inv of incoming) {
+    if (inv.bild || inv.pdf) inv.syncPending = true
+  }
+
   for (const inv of incoming) {
     // 1. per id suchen (v2), 2. per nummer (v1-Kompatibilität)
     let existing: Invoice | undefined = await db.invoices.get(inv.id)

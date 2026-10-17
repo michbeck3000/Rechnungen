@@ -1,7 +1,9 @@
 // Sync: IndexedDB (lokale Wahrheit, offline-fähig) <-> Supabase.
-// Strategie: Push dann Pull, Konflikt = neuere updatedAt gewinnt (ISO-Strings
-// sind lexikografisch vergleichbar). Löschen läuft über Tombstones/Soft-Delete.
-// Anhänge liegen in Supabase Storage (<userId>/<invoiceId>/bild|pdf).
+// Strategie: Push dann Pull, Konflikt = neuere updatedAt gewinnt. Löschen läuft
+// über Tombstones/Soft-Delete, Anhänge liegen in Supabase Storage
+// (<userId>/<invoiceId>/bild|pdf).
+// Fehler einzelner Anhänge/Zeilen brechen den Lauf nicht ab: sie werden
+// gesammelt, gemeldet und über `syncPending` beim nächsten Lauf erneut versucht.
 import { db } from './db'
 import { supabase } from './supabase'
 import type { Invoice, InvoiceStatus } from './types'
@@ -25,6 +27,11 @@ export interface RemoteRow {
   deleted_at: string | null
 }
 
+/** Pfad eines Anhangs im Storage. */
+export function attachPath(userId: string, invoiceId: string, kind: 'bild' | 'pdf'): string {
+  return `${userId}/${invoiceId}/${kind}`
+}
+
 /** Lokal -> Remote-Zeile (ohne Anhang-Blobs, nur Pfade). */
 export function localToRow(inv: Invoice, userId: string): RemoteRow {
   return {
@@ -37,8 +44,8 @@ export function localToRow(inv: Invoice, userId: string): RemoteRow {
     faelligkeit: inv.faelligkeit || null,
     status: [...inv.status],
     iban: inv.iban,
-    bild_path: inv.bild ? `${userId}/${inv.id}/bild` : null,
-    pdf_path: inv.pdf ? `${userId}/${inv.id}/pdf` : null,
+    bild_path: inv.bild ? attachPath(userId, inv.id, 'bild') : null,
+    pdf_path: inv.pdf ? attachPath(userId, inv.id, 'pdf') : null,
     created_at: inv.createdAt,
     updated_at: inv.updatedAt,
     deleted_at: null,
@@ -62,6 +69,43 @@ export function rowToLocal(row: RemoteRow): Invoice {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
+}
+
+/**
+ * Postgres liefert Zeitstempel als `2026-01-06T10:00:00.123456+00:00`, lokal
+ * wird `…Z` geschrieben. Für den lexikografischen Vergleich beides auf
+ * ISO-UTC mit Millisekunden normalisieren.
+ */
+export function normalizeTimestamp(value: string | null | undefined): string | null {
+  if (!value) return null
+  const d = new Date(value)
+  return Number.isNaN(d.getTime()) ? null : d.toISOString()
+}
+
+function normalizeRow(row: RemoteRow): RemoteRow {
+  return {
+    ...row,
+    created_at: normalizeTimestamp(row.created_at) ?? row.created_at,
+    updated_at: normalizeTimestamp(row.updated_at) ?? row.updated_at,
+    deleted_at: normalizeTimestamp(row.deleted_at),
+  }
+}
+
+/** Fehlermeldung möglichst aussagekräftig machen (Status, Code, Details). */
+export function describeError(err: unknown): string {
+  if (err && typeof err === 'object') {
+    const e = err as { message?: string; statusCode?: string | number; code?: string; details?: string; hint?: string }
+    const bits = [
+      e.message,
+      e.statusCode ? `HTTP ${e.statusCode}` : '',
+      e.code ? `Code ${e.code}` : '',
+      e.details,
+      e.hint,
+    ].filter((x): x is string => typeof x === 'string' && x.length > 0)
+    if (bits.length > 0) return bits.join(' · ')
+  }
+  if (err instanceof Error) return err.message
+  return String(err)
 }
 
 export type SyncState =
@@ -124,6 +168,35 @@ async function downloadBlob(path: string): Promise<Blob | undefined> {
   return data
 }
 
+/**
+ * Anhang hochladen. Falls `upsert` scheitert (z.B. fehlende UPDATE-Policy oder
+ * liegengebliebenes Objekt), einmal aufräumen und neu anlegen.
+ */
+async function uploadAttachment(path: string, blob: Blob, contentType: string): Promise<unknown | null> {
+  const first = await supabase.storage.from(ATTACH_BUCKET).upload(path, blob, { upsert: true, contentType })
+  if (!first.error) return null
+  await supabase.storage.from(ATTACH_BUCKET).remove([path])
+  const second = await supabase.storage.from(ATTACH_BUCKET).upload(path, blob, { upsert: true, contentType })
+  if (second.error) {
+    return { ...second.error, message: `${describeError(second.error)} (ursprünglich: ${describeError(first.error)})` }
+  }
+  return null
+}
+
+async function removeAttachments(paths: string[]) {
+  if (paths.length === 0) return
+  // Best effort: nicht vorhandene Objekte sind kein Fehler.
+  await supabase.storage.from(ATTACH_BUCKET).remove(paths)
+}
+
+async function setPending(id: string, pending: boolean) {
+  try {
+    await db.invoices.update(id, { syncPending: pending })
+  } catch {
+    // Record evtl. inzwischen gelöscht – ignorieren
+  }
+}
+
 /** Kompletter Sync: Push lokaler Änderungen, dann Pull. Idempotent. */
 export async function syncNow(): Promise<void> {
   const { data: session } = await supabase.auth.getSession()
@@ -131,78 +204,124 @@ export async function syncNow(): Promise<void> {
   if (!user) return
   if (state.kind === 'syncing') return
   setState({ kind: 'syncing' })
+  const problems: string[] = []
   try {
     const last = loadLastFor(user.id)
 
-    // --- Push: lokale Rechnungen hoch (nur neue/geänderte seit letztem Push) ---
+    // --- Push: neue/geänderte Zeilen und solche mit offenen Anhängen ---
     const locals = await db.invoices.toArray()
-    const toPush = last ? locals.filter((l) => l.updatedAt > last) : locals
+    const toPush = locals.filter((l) => !last || l.updatedAt > last || l.syncPending === true)
     for (const inv of toPush) {
+      const label = inv.name || 'Unbenannt'
       const row = localToRow(inv, user.id)
+      const payload: Record<string, unknown> = { ...row }
+      let attachmentsOk = true
+
       if (inv.bild && row.bild_path) {
-        const { error } = await supabase.storage
-          .from(ATTACH_BUCKET)
-          .upload(row.bild_path, inv.bild, { upsert: true, contentType: inv.bildType || inv.bild.type })
-        if (error) throw error
+        const err = await uploadAttachment(row.bild_path, inv.bild, inv.bildType || inv.bild.type || 'image/jpeg')
+        if (err) {
+          // Pfad nicht mitschicken: Remote-Stand nicht kaputt machen, Retry über syncPending.
+          delete payload.bild_path
+          attachmentsOk = false
+          problems.push(`Foto „${label}“: ${describeError(err)}`)
+        }
       }
       if (inv.pdf && row.pdf_path) {
-        const { error } = await supabase.storage
-          .from(ATTACH_BUCKET)
-          .upload(row.pdf_path, inv.pdf, { upsert: true, contentType: 'application/pdf' })
-        if (error) throw error
+        const err = await uploadAttachment(row.pdf_path, inv.pdf, 'application/pdf')
+        if (err) {
+          delete payload.pdf_path
+          attachmentsOk = false
+          problems.push(`PDF „${label}“: ${describeError(err)}`)
+        }
       }
-      const { error } = await supabase.from('invoices').upsert(row)
-      if (error) throw error
+
+      // Entfernte Anhänge auch aus dem Storage räumen (best effort).
+      const gone: string[] = []
+      if (!inv.bild) gone.push(attachPath(user.id, inv.id, 'bild'))
+      if (!inv.pdf) gone.push(attachPath(user.id, inv.id, 'pdf'))
+      await removeAttachments(gone)
+
+      const { error } = await supabase.from('invoices').upsert(payload)
+      if (error) {
+        problems.push(`Rechnung „${label}“: ${describeError(error)}`)
+        await setPending(inv.id, true)
+        continue
+      }
+      if (inv.syncPending || !attachmentsOk) await setPending(inv.id, !attachmentsOk)
     }
 
     // --- Push: Tombstones (gelöschte) als Soft-Delete propagieren ---
     const tombs = await db.tombstones.toArray()
+    const doneTombs: string[] = []
     for (const t of tombs) {
+      await removeAttachments([attachPath(user.id, t.id, 'bild'), attachPath(user.id, t.id, 'pdf')])
       const { error } = await supabase.from('invoices').upsert({
         id: t.id,
         user_id: user.id,
         updated_at: t.updatedAt,
         deleted_at: t.updatedAt,
       })
-      if (error) throw error
+      if (error) problems.push(`Löschen: ${describeError(error)}`)
+      else doneTombs.push(t.id)
     }
-    if (tombs.length > 0) await db.tombstones.clear()
+    if (doneTombs.length > 0) await db.tombstones.bulkDelete(doneTombs)
 
     // --- Pull: Remote-Stand holen, neuere gewinnen ---
     const { data: remote, error: pullError } = await supabase.from('invoices').select('*')
     if (pullError) throw pullError
-    for (const row of (remote ?? []) as RemoteRow[]) {
+    for (const raw of (remote ?? []) as RemoteRow[]) {
+      const row = normalizeRow(raw)
       const local = await db.invoices.get(row.id)
       if (row.deleted_at) {
         if (local) await db.invoices.delete(row.id)
         continue
       }
-      if (!local || row.updated_at > local.updatedAt) {
-        const merged = rowToLocal(row)
-        if (row.bild_path) {
-          const blob = await downloadBlob(row.bild_path)
-          if (blob) {
-            merged.bild = blob
-            merged.bildType = blob.type
-          }
+      // Anhang-Download fehlgeschlagen? Dann trotz gleichem Stand erneut versuchen.
+      const missingAttachment =
+        local?.syncPending === true &&
+        ((!!row.bild_path && !local.bild) || (!!row.pdf_path && !local.pdf))
+      if (local && !missingAttachment && row.updated_at <= local.updatedAt) continue
+
+      const merged = rowToLocal(row)
+      let downloadFailed = false
+      if (row.bild_path) {
+        const blob = await downloadBlob(row.bild_path)
+        if (blob) {
+          merged.bild = blob
+          merged.bildType = blob.type || local?.bildType || 'image/jpeg'
+          merged.bildName = local?.bildName
+        } else {
+          downloadFailed = true
+          problems.push(`Foto „${merged.name || 'Unbenannt'}“: Download fehlgeschlagen`)
         }
-        if (row.pdf_path) {
-          const blob = await downloadBlob(row.pdf_path)
-          if (blob) {
-            merged.pdf = blob
-            merged.pdfName = local?.pdfName
-          }
-        }
-        if (!merged.pdfName && row.pdf_path) merged.pdfName = 'Anhang.pdf'
-        await db.invoices.put(merged)
       }
+      // Kein bild_path -> Anhang wurde auf einem anderen Gerät entfernt
+      // (merged enthält dann bewusst keinen bild-Schlüssel).
+      if (row.pdf_path) {
+        const blob = await downloadBlob(row.pdf_path)
+        if (blob) {
+          merged.pdf = blob
+          merged.pdfName = local?.pdfName ?? 'Anhang.pdf'
+        } else {
+          downloadFailed = true
+          problems.push(`PDF „${merged.name || 'Unbenannt'}“: Download fehlgeschlagen`)
+        }
+      }
+      if (downloadFailed) merged.syncPending = true
+      await db.invoices.put(merged)
     }
 
     const now = new Date().toISOString()
     saveLastFor(user.id, now)
-    setState({ kind: 'idle', at: now })
+    if (problems.length > 0) {
+      const shown = problems.slice(0, 3).join(' | ')
+      const rest = problems.length > 3 ? ` | +${problems.length - 3} weitere` : ''
+      setState({ kind: 'error', message: shown + rest })
+    } else {
+      setState({ kind: 'idle', at: now })
+    }
   } catch (err) {
-    setState({ kind: 'error', message: (err as Error).message })
+    setState({ kind: 'error', message: describeError(err) })
   }
 }
 

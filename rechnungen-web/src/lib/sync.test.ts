@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { localToRow, rowToLocal } from './sync'
+import { attachPath, describeError, localToRow, normalizeTimestamp, rowToLocal } from './sync'
 import type { Invoice } from './types'
 
 const sample: Invoice = {
@@ -43,5 +43,31 @@ describe('sync mapping', () => {
     expect(back.id).toBe(sample.id)
     expect(back.summe).toBe(sample.summe)
     expect(back.status).toEqual(sample.status)
+  })
+
+  it('Anhang-Pfade folgen dem Schema <user>/<id>/bild|pdf', () => {
+    const withFiles: Invoice = {
+      ...sample,
+      bild: new Blob(['x'], { type: 'image/jpeg' }),
+      pdf: new Blob(['y'], { type: 'application/pdf' }),
+    }
+    const row = localToRow(withFiles, 'user-1')
+    expect(row.bild_path).toBe('user-1/11111111-1111-4111-8111-111111111111/bild')
+    expect(row.pdf_path).toBe(attachPath('user-1', sample.id, 'pdf'))
+  })
+
+  it('normalisiert Postgres-Zeitstempel für den Vergleich', () => {
+    const remote = normalizeTimestamp('2026-01-06T10:00:00.123456+00:00')
+    expect(remote).toBe('2026-01-06T10:00:00.123Z')
+    // Vergleich mit lokalem ISO-String ist damit korrekt
+    expect(remote! > '2026-01-06T10:00:00.000Z').toBe(true)
+    expect(normalizeTimestamp(null)).toBeNull()
+    expect(normalizeTimestamp('')).toBeNull()
+  })
+
+  it('describeError zeigt Status, Code und Details', () => {
+    expect(describeError({ message: 'nope', statusCode: 413, code: 'X', details: 'zu groß' })).toBe('nope · HTTP 413 · Code X · zu groß')
+    expect(describeError(new Error('kaputt'))).toBe('kaputt')
+    expect(describeError('roh')).toBe('roh')
   })
 })

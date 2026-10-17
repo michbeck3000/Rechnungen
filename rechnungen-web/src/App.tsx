@@ -13,18 +13,28 @@ import type { Invoice, InvoiceStatus } from './lib/types'
 
 type Tab = 'liste' | 'statistik' | 'backup'
 
+/** Ganze Tage bis zur Fälligkeit (negativ = überfällig). */
+function daysUntilDue(iso: string): number {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const due = new Date(iso + 'T00:00:00')
+  return Math.round((due.getTime() - today.getTime()) / 86400000)
+}
+
+/** Rot erst kurz vor / nach der Fälligkeit (< 2 Tage), sonst gelb. */
+function dueIsUrgent(inv: Invoice): boolean {
+  return !!inv.faelligkeit && daysUntilDue(inv.faelligkeit) < 2
+}
+
 function cardStatus(inv: Invoice): { dot: string; text: string; textClass: string } {
   const bezahlt = inv.status.includes('Bezahlt')
   if (bezahlt) return { dot: 'bg-green-500', text: 'BEZAHLT', textClass: 'text-green-600 dark:text-green-400' }
-  if (!inv.faelligkeit) return { dot: 'bg-gray-400', text: 'OFFEN', textClass: 'text-gray-500' }
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const due = new Date(inv.faelligkeit + 'T00:00:00')
-  const diff = Math.round((due.getTime() - today.getTime()) / 86400000)
+  if (!inv.faelligkeit) return { dot: 'bg-amber-500', text: 'OFFEN', textClass: 'text-amber-600 dark:text-amber-400' }
+  const diff = daysUntilDue(inv.faelligkeit)
   if (diff < 0) return { dot: 'bg-red-500', text: 'ÜBERFÄLLIG', textClass: 'text-red-600 dark:text-red-400' }
-  if (diff === 0) return { dot: 'bg-amber-500', text: 'HEUTE FÄLLIG', textClass: 'text-amber-600 dark:text-amber-400' }
-  if (diff === 1) return { dot: 'bg-red-500', text: 'FÄLLIG MORGEN', textClass: 'text-red-600 dark:text-red-400' }
-  return { dot: 'bg-red-500', text: `FÄLLIG IN ${diff} TAGEN`, textClass: 'text-red-600 dark:text-red-400' }
+  if (diff === 0) return { dot: 'bg-red-500', text: 'HEUTE FÄLLIG', textClass: 'text-red-600 dark:text-red-400' }
+  if (diff === 1) return { dot: 'bg-red-500', text: 'MORGEN FÄLLIG', textClass: 'text-red-600 dark:text-red-400' }
+  return { dot: 'bg-amber-500', text: `FÄLLIG IN ${diff} TAGEN`, textClass: 'text-amber-600 dark:text-amber-400' }
 }
 
 export default function App() {
@@ -246,7 +256,7 @@ export default function App() {
                       >
                         <div className="flex items-baseline justify-between gap-3">
                           <span className="truncate text-[17px] font-medium text-gray-900 dark:text-gray-50">{inv.name || 'Unbenannt'}</span>
-                          <span className={`shrink-0 text-[17px] font-semibold tabular-nums ${bezahlt ? 'text-gray-900 dark:text-gray-50' : 'text-red-600 dark:text-red-400'}`}>
+                          <span className={`shrink-0 text-[17px] font-semibold tabular-nums ${bezahlt ? 'text-gray-900 dark:text-gray-50' : dueIsUrgent(inv) ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`}>
                             {formatGermanDecimal(Number(inv.summe))}
                           </span>
                         </div>

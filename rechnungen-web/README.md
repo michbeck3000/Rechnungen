@@ -1,7 +1,7 @@
 # Rechnungen Web
 
-Statische PWA (React + TypeScript + Tailwind + Dexie/IndexedDB), hostbar auf GitHub Pages.
-Das Xcode-Projekt bleibt unangetastet daneben bestehen.
+Statische PWA (React + TypeScript + Tailwind + Dexie/IndexedDB), gehostet auf GitHub Pages.
+Die Web-App ist der einzige Teil dieses Repos (die frühere iOS-App liegt nur noch in der Git-Historie).
 
 ## Start
 
@@ -18,7 +18,8 @@ npm run build   # dist/
 - Liste mit Suche, unbezahlte zuerst (Fälligkeit aufsteigend), bezahlte danach absteigend
 - Detail mit PKV/Beihilfe/Bezahlt-Toggles, Copy-Buttons, Bild/PDF-Anhang
 - GiroCode-QR (EPC069-12) nach Name + gültiger IBAN (mod-97) + Betrag
-- Statistik bezahlter Rechnungen pro Jahr
+- Statistik: Summen bezahlter Rechnungen pro Jahr + Top 10 Empfänger (nach überwiesener Summe)
+- Sync über Supabase (Magic-Link/Passwort-Login), siehe Abschnitt „Sync“ weiter unten
 - Backup v2 (JSON-Download) + Import von v2 **und** alten iOS-Backups v1 (`Rechnungen_Backup_*.json`)
 
 ## Backup-Formate

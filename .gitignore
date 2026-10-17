@@ -1,18 +1,3 @@
-# Xcode
-xcuserdata/
-*.xcuserdatad
-DerivedData/
-*.xcbkptlist
-build/
-*.ipa
-*.dSYM.zip
-*.dSYM
-
-# Python
-.venv/
-__pycache__/
-*.pyc
-
 # macOS
 .DS_Store
 

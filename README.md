@@ -1,54 +1,14 @@
 # Rechnungen
 
-iOS-App zur privaten Rechnungsverwaltung mit Fokus auf das deutsche Gesundheitswesen (PKV/Beihilfe) – inklusive Apple Watch-Begleiter.
+Web-App (React-PWA) zur privaten Rechnungsverwaltung mit Fokus auf das deutsche Gesundheitswesen (PKV/Beihilfe) – läuft im Browser und synchronisiert per Supabase zwischen den Geräten.
 
-## Features
+* **App:** <https://michbeck3000.github.io/Rechnungen/> (iPhone: „Zum Home-Bildschirm“, Mac: „Zum Dock hinzufügen“)
+* **Code:** [`rechnungen-web/`](rechnungen-web/) – Setup, Datenmodell, Sync und Deployment: siehe [`rechnungen-web/README.md`](rechnungen-web/README.md)
+* **Deployment:** GitHub Actions (`.github/workflows/pages.yml`) baut `rechnungen-web/dist` und veröffentlicht es auf GitHub Pages
 
-- **Rechnungen erfassen & verwalten** mit Foto oder PDF-Anhang
-- **Status-Tracking** – PKV eingereicht, Beihilfe eingereicht, bezahlt
-- **GiroCode (EPC069-12)** – QR-Code für SEPA-Überweisungen direkt in der App
-- **Apple Watch** – QR-Code zum Bezahlen auf der Watch anzeigen
-- **iCloud-Sync** via CloudKit
-- **Backup & Wiederherstellung** als JSON-Export/Import
-- **Suche & Sortierung** – unbezahlte Rechnungen zuerst
+## Hinweis
 
-## Technologie
-
-| Bereich | Technologie |
-|---------|-------------|
-| UI | SwiftUI |
-| Datenspeicher | Core Data + CloudKit |
-| Watch | WatchConnectivity |
-| QR-Code | CoreImage (CIQRCodeGenerator) |
-| PDF | PDFKit, QuickLook |
-| Mindestversion | iOS 17+ / watchOS 10+ |
-
-## Projektstruktur
-
-```
-Rechnungen/
-├── RechnungenApp.swift          # App-Einstiegspunkt
-├── ContentView.swift            # Haupt-Views (Liste, Detail, Formulare)
-├── Persistence.swift            # Core Data Stack (CloudKit)
-├── BackupManager.swift          # Backup-Export/Import
-├── GiroCodeGenerator.swift      # EPC069-12 QR-Code Generator
-├── ConnectivityManager.swift    # iPhone-Seite WatchConnectivity
-├── Extensions/
-│   └── String+IBAN.swift        # IBAN-Formatierung
-├── Views/
-│   ├── BackupView.swift         # Backup-UI
-│   ├── InvoiceRowView.swift     # Rechnungszeile mit Kontextmenü
-│   ├── PaymentQRCodeView.swift  # QR-Code-Anzeige
-│   └── ShareSheet.swift         # ShareSheet (UIKit-Bridge)
-├── Rechnungen.xcdatamodeld/     # Core-Data-Modell
-├── RechnungenWatch Watch App/   # watchOS Begleiter-App
-├── RechnungenTests/             # Unit Tests (Swift Testing)
-└── RechnungenUITests/           # UI Tests (XCTest)
-```
-
-## Datenmodell
-
-Eine Core Data Entität `Rechnungen` mit Attributen: `name`, `nummer`, `summe`, `datum`, `faelligkeit`, `status` (komma-separiert), `iban`, `bild`, `pdf`.
+Die frühere iOS/SwiftUI-App ist nicht mehr Teil dieses Repos; ihre Commits sind weiterhin in der Git-Historie erhalten. Weiterentwickelt wird nur noch die Web-App.
 
 ## Autor
 

@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import type { Session } from '@supabase/supabase-js'
 import { db, listInvoices, newId, nowISO, todayISO } from './lib/db'
@@ -40,6 +40,7 @@ function cardStatus(inv: Invoice): { dot: string; text: string; textClass: strin
 export default function App() {
   const [tab, setTab] = useState<Tab>('liste')
   const [search, setSearch] = useState('')
+  const searchRef = useRef<HTMLInputElement>(null)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [editing, setEditing] = useState<Invoice | null>(null)
@@ -227,12 +228,24 @@ export default function App() {
             {!selected && (
               <div className="relative mb-3">
               <input
+                ref={searchRef}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Suchen"
-                className="w-full rounded-full border border-gray-200 bg-white py-2 pl-9 pr-4 text-[15px] outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900"
+                className="w-full rounded-full border border-gray-200 bg-white py-2 pl-9 pr-10 text-[15px] outline-none focus:border-blue-500 dark:border-gray-700 dark:bg-gray-900"
               />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">⌕</span>
+              <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">⌕</span>
+              {search !== '' && (
+                <button
+                  type="button"
+                  onClick={() => { setSearch(''); searchRef.current?.focus() }}
+                  aria-label="Suche löschen"
+                  title="Suche löschen"
+                  className="absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full bg-gray-200 text-xs leading-none text-gray-600 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                >
+                  ✕
+                </button>
+              )}
             </div>
             )}
 

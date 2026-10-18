@@ -276,7 +276,7 @@ export default function App() {
                           </span>
                         </div>
                         <div className="mt-0.5 text-[15px] text-gray-900 dark:text-gray-200">
-                          {formatDateISO(inv.faelligkeit)}
+                          {formatDateISO(inv.datum)}
                         </div>
                       </button>
                       <div className="flex items-center gap-2 rounded-b-2xl border-t border-gray-100 bg-gray-50/60 px-4 py-2 dark:border-gray-800 dark:bg-gray-800/40">

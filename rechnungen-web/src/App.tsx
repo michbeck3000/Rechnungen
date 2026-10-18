@@ -483,13 +483,19 @@ function DetailView({ invoice, onBack, onToggle, onEdit, onDelete, onDuplicate, 
       )}
 
       <div className="rounded-2xl border border-gray-200 bg-white p-4 dark:border-gray-800 dark:bg-gray-900">
-        <h2 className="text-lg font-bold">{invoice.name}</h2>
+        <button
+          onClick={() => copy(invoice.name || 'Unbenannt', 'Name')}
+          title="Name kopieren"
+          className="flex w-full items-start gap-2 text-left"
+        >
+          <span className="break-words text-lg font-bold">{invoice.name || 'Unbenannt'}</span>
+          <span className="mt-0.5 text-blue-600">⧉</span>
+        </button>
         <dl className="mt-3 space-y-2 text-base">
           <div className="flex justify-between gap-2"><dt className="text-gray-500">Verwendungszweck</dt><dd className="text-right font-medium"><button onClick={() => copy(invoice.nummer, 'Verwendungszweck')} title="Verwendungszweck kopieren" className="text-right"><span className="mr-1 text-blue-600">⧉</span>{invoice.nummer}</button></dd></div>
           <div className="flex justify-between gap-2"><dt className="text-gray-500">Betrag</dt><dd className="text-right font-medium"><button onClick={() => copy(String(Number(invoice.summe).toFixed(2)).replace('.', ','), 'Betrag')} title="Betrag kopieren" className="text-right"><span className="mr-1 text-blue-600">⧉</span>{formatGermanDecimal(Number(invoice.summe))}</button></dd></div>
           <div className="flex justify-between gap-2"><dt className="text-gray-500">Datum</dt><dd className="font-medium">{formatDateISO(invoice.datum)}</dd></div>
           <div className="flex justify-between gap-2"><dt className="text-gray-500">Fällig</dt><dd className="font-medium">{formatDateISO(invoice.faelligkeit)}</dd></div>
-          <div className="flex justify-between gap-2"><dt className="text-gray-500">Name</dt><dd className="text-right font-medium"><button onClick={() => copy(invoice.name, 'Name')} title="Name kopieren" className="text-right"><span className="mr-1 text-blue-600">⧉</span>{invoice.name}</button></dd></div>
           {invoice.iban && <div className="flex justify-between gap-2"><dt className="text-gray-500">IBAN</dt><dd className="text-right font-medium"><button onClick={() => copy(invoice.iban, 'IBAN')} title="IBAN kopieren" className="text-right"><span className="mr-1 text-blue-600">⧉</span>{formatIBAN(invoice.iban)}</button></dd></div>}
         </dl>
         <div className="mt-3 space-y-2">
